@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html lang="en"> <head>
+<title>Project 8: MeetMe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" type="text/css"
+     href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css"
+/>
+
+<!-- our own css -->
+<link rel="stylesheet" type="text/css"
+    href="/static/css/busy.css"
+/>
+
+<!-- jquery from a content distribution network; probably cached -->
+<script type="text/javascript"
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+</script>
+
+
+<!-- for date range picker -->
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+ 
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+</head>
+
+<body>
+<div class="container">
+
+<!-- if a time was entered incorrectly -->
+{% if session.bad_time == "true" %}
+  <div class="row space-below">
+  <span class="col-xs-8">
+    You entered an
+    <span style="color:red; font-weight:bold">invalid time</span>.
+    Both the start and end times should be entered in standard 24- or 12-hour
+    format. For example, 13:30 or 1:30pm. Both times must be provided, and
+    the start time must be before the end time. Try again!
+  </span>
+  </div>
+{% endif %}
+
+<!-- display the delete message -->
+{% if session.processed_delete == "yes" %}
+	<div class="row space-below">
+	<span class="col-xs-8" style="color:green">
+		Meeting proposal successfully destroyed!
+	</span>
+	</div>
+{% endif %}
+
+<h1>
+<a class="meetme" href="/">MeetMe</a>
+</h1>
+
+<div class="row space-below">
+<div class="col-xs-8">
+  Time to schedule a meeting! To get started, set a range of dates during which
+  the meeting can happen. Optionally, limit the potential meeting times to certain
+  hours of the day. Finally, tap the button to automatically pull in your own
+  availability information from your Google Calendar data and create the
+  meeting proposal.
+</div>
+</div>
+
+
+<!-- dropdown menu to pick the date range (from Date Range Picker) -->
+<form action="/setrange_from_index" method="post">
+
+  <div class="row">
+  <div class="col-xs-10">
+    Range of dates for the meeting:
+    <input type="text" name="daterange" size="14"
+      {% if session.daterange is defined %}
+           value="{{session.daterange}}"
+      {% endif %}
+       class="pull-down space-below"
+       style="background: #fff; cursor: pointer; padding: 5px 10px;
+       border: 1px solid #ccc; width: 14em" >
+    <script type="text/javascript">
+    $(function() {
+    $('input[name="daterange"]').daterangepicker(
+      {    ranges: {
+             'Today': [moment(), moment()],
+             'Tomorrow':[moment().add(1, 'days'),
+                         moment().add(1, 'days')], 
+             'This week':[moment(), moment().endOf('week')],
+             'Next week':[moment().add(7, 'days').startOf('week'),
+                          moment().add(7, 'days').endOf('week')],
+             'This month':[moment(), moment().endOf('month')],
+             'Within two weeks':[moment(),moment().add(15, 'days')]
+          }}
+         );
+      });
+    </script>
+  </div>
+  </div>
+
+  <!-- optional time range input -->
+  <div class="row space-below">
+  <div class="col-xs-10">
+    <span style="color: gray"><span style="font-weight: bold"> [optional] </span>
+    Limit each day's potential meeting times to certain hours:</span>
+    <input type="text" size="15" name="begin_time"
+      {% if session.begin_time is defined and session.begin_time | fmttime != '00:00' %}
+        value="{{ session.begin_time | fmttime }}"
+      {% endif %}
+      placeholder="start">
+    <span style="color: gray">to</span>
+    <input type="text" size="15" name="end_time"
+      {% if session.end_time is defined and session.end_time | fmttime != '23:59' %} 
+        value="{{ session.end_time | fmttime }}" 
+      {% endif %}
+      placeholder="end">
+  </div>
+  </div>
+  
+  <!-- submit button -->
+  <div class="row">
+  <div class="col-xs-10">
+    <button type="submit" class="btn btn-success">Create</button>
+    <!-- <input type="submit" value="Create" /> -->
+  </div>
+  </div>
+  
+</form>
+    
+
+</div>  <!-- container (for bootstrap) -->
+</body> </html>

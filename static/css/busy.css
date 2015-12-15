@@ -1,0 +1,24 @@
+/*
+ * Custom CSS
+ */
+
+/* for selecting which elements on the page to display */
+.hidden{
+    display: none;
+}
+
+/* some space between the bootstrap grid rows */
+.space-below {
+    margin-bottom: 2%;
+}
+
+/* custom header */
+.meetme, .meetme:hover{
+    font-family:Georgia,sans-serif;
+    font-variant: small-caps;
+    text-transform: none;
+    font-weight: bold;
+    margin-bottom: 0;
+    color: #8b8bff;
+    text-decoration: none;
+}

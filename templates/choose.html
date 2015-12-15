@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html lang="en"> <head>
+<title>Project 8: MeetMe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" type="text/css"
+     href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css"
+/>
+
+<!-- our own css -->
+<link rel="stylesheet" type="text/css"
+    href="/static/css/busy.css"
+/>
+
+<!-- jquery from a content distribution network; probably cached -->
+<script type="text/javascript"
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+</script>
+
+
+<!-- for date range picker -->
+<!-- Include Required Prerequisites -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+ 
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+</head>
+
+<body>
+<div class="container">
+
+<h1>
+<a class="meetme" href="/">MeetMe</a>
+</h1>
+
+<!-- if the database lookup fails -->
+{% if session.key_not_found == "true" %}
+  <div class="row space-below">
+  <span class="col-xs-8">
+    Meeting proposal {{ session.key }}
+    <span style="color:rgb(204,204,0); font-weight:bold">not found</span>.
+    Please try the link again.
+  </span>
+  </div>
+
+<!-- else the database lookup was ok -->
+{% else %}
+
+<!-- display the access information -->
+<h2> Access this meeting proposal </h2>
+
+<div class="row space-below">
+<span class="col-xs-8">
+	Use the first URL below if you want to return to this page to manage the meeting
+	proposal. Send the second URL to potential meeting participants to have
+	them update the proposed meeting times with their own availability information.
+</span>
+</div>
+
+<div class="row space-below">
+<span class="col-xs-3"> Manage this meeting proposal: </span>
+<input type="text" class="col-xs-5" onfocus="this.select();" onmouseup="return false;" value = "{{ session.choose_url }}" readonly="readonly" />
+</div>
+
+<div class="row space-below">
+<span class="col-xs-3"> Send to meeting participants: </span>
+<input type="text" class="col-xs-5" onfocus="this.select();" onmouseup="return false;" value = "{{ session.participate_url }}" readonly="readonly" />
+</div>
+
+
+<!-- display the free times -->
+{% if session.free_times is defined  %}
+  <h2>Available meeting times</h2>
+  <div class="row space-below">
+  <span class="col-xs-8">
+  The following potential meeting times are open for all participants who
+  have responded.
+  </span>
+  </div>
+    <ul>
+    {% for t in session.free_times %}
+      <li>{{ t[0] | fmtdatetime }} -- {{ t[1] | fmtdatetime }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+
+<!-- interface for confirming a meeting -->
+<h2>Confirm the meeting</h2>
+<div class="row space-below">
+	<span class="col-xs-8">
+	{% if session.confirmed == "no" %}
+		If you're ready, you can confirm the meeting time. When you confirm the
+		meeting, the available times will no longer be updated, and participants who
+		visit the link above will be notified of the confirmed time.
+	{% else %}
+		<p>The meeting has been <span style="color:green; font-weight:bold">confirmed</span> for {{ session.confirmed.begin }} to
+		{{ session.confirmed.end }}.</p>
+		<p>If you want, you can confirm a different time:</p>
+	{% endif %}
+	</span>
+</div>
+<form action="/_confirm_proposal" method="post">
+  <input size="20" type="text" name="confirm_begin" placeholder="start">
+  <span>to</span>
+  <input size="20" type="text" name="confirm_end" placeholder="end">
+	<button type="submit" class="btn btn-success" name="key" value="{{ session.key }}">confirm meeting</button>
+</form>
+
+
+<!-- interface for deletion -->
+<h2>Delete proposal</h2>
+<div class="row space-below">
+	<span class="col-xs-8">
+	Caution: this option destroys all the data associated with this meeting
+	proposal.
+	</span>
+</div>
+<form action="/_delete_proposal" method="post">
+	<button type="submit" class="btn btn-danger" name="key" value="{{ session.key }}">delete proposal</button>
+</form>
+
+{% endif %}
+
+</div>  <!-- container (for bootstrap) -->
+</body> </html>
